@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device", initila-scale="1,0"/>
+    <title>Wallstreet insights - Live market tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;1,300&family=Lato:wght@300;400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="style.css"/>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <span class="logo-text">Wallstreet Insights</span>
+            <div class="logo-dot"></div>
+        </div>
+
+        <div class="header-right">
+            <div class="beta-badge">BETA</div>
+        </div>
+    </header>
+
+    <main>
+        <div class="setup-banner" id="setupBanner">
+            <span class="setup-icon">⚙️</span>
+            <p class="setup-text">
+                <strong>Almost ready.</strong> Open <code>app.js</code> and add your API keys to activate live data.
+            </p>
+        </div>
+
+        <section class="search-section">
+            <p class="search-lable">Add stock to watchlist</p>
+            <div class="search-row">
+                <input
+                  type="text"
+                  id="searchInput"
+                  class="search-input"
+                  placeholder="Enter ticker symbol"
+                  maxlength="10"
+                />
+                <button class="btn" onclick="addStock()">+ Add Stock</button>  
+            </div>
+            <div class="status-msg" id="statusMsg"></div>    
+        </section>
+
+        <section class="watchlist-section">
+
+            <div class="section-header">
+                <h2 class="section-title">Watchlist</h2>
+                <div class="section-controls">
+
+                    <div class="sort-row">
+                        <span class="sort-label">Sort:</span>
+                        <button class="sort-btn active" id="sort-symbol" onclick="sortWatchlist('symbol')">Symbol</button>
+                        <button class="sort-btn" id="sort-price" onclick="sortWatchlist('price')">Price</button>
+                        <button class="sort-btn" id="sort-change" onclick="sortWatchlist('change')">Change %</button>
+                    </div>
+
+                    <span class="section-count" id="watchlistCount">0 stocks</span>
+                
+                </div>
+            </div>
+
+            <div class="watchlist-grid" id="watchlistGrid">
+                <div class="empty-state">
+                    <p class="empty-icon">📈</p>
+                    <h3 class="empty-title">Your watchlist is empty</h3>
+                    <p class="empty-sub">Search for a ticker symbol above to get started</p>
+                </div>
+            </div>
+
+        </section>
+
+        <hr class="divider"/>
+
+        <section class="compare-section" id="compareSection" style="display:none">
+
+            <div class="section-header">
+                <h2 class="section-title">Comparison</h2>
+                <span class="section-count" id="compareCount"></span>
+            </div>
+
+            <div class="compare-tags" id="compareBar"></div>
+
+            <table class="compare-table">
+                <thead>
+                  <tr>
+                    <th>Symbol</th>
+                    <th>Price</th>
+                    <th>Change</th>
+                    <th>Change %</th>
+                    <th>High</th>
+                    <th>Low</th>
+                    <th>Volume</th>
+                  </tr>
+                </thead>
+                <tbody id="compareBody"></tbody>
+            </table>
+
+        </section>
+
+        <hr class="divider" id="newsDivider" style="display:none"/>
+
+        <section id="newsSection" style="display:none">
+
+            <div class="section-header">
+             <h2 class="section-title">News</h2>
+            </div>
+
+            <div class="news-filter" id="newsFilter"></div>
+
+            <div class="news-grid" id="newsGrid"></div>
+
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
+
