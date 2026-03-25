@@ -432,6 +432,12 @@ main {
   margin: 2.5rem 0;
 }
 
+.section-hint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
 .compare-section {
   margin-bottom: 2.5rem;
 }
