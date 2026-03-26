@@ -6,7 +6,7 @@ You can search for any stock by ticker symbol, track prices, compare performance
 ## Live demo
 
 |Server | URL |
-Load Balancer | `http://54.87.168.130` |
+Load Balancer | `https://www.mskanogo.tech` |
 Web01 | `http://34.227.15.242` |
 Web02 | `http://13.222.62.164` |
 
