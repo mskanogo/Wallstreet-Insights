@@ -36,9 +36,9 @@ if (!DEMO_MODE) {
 
 document.addEventListener('DOMContentLoaded', () => {
 
- document.getElementById('setupBanner').style.display = 'none';
-  
- document.getElementById('searchInput').addEventListener('keydown', e => {
+  document.getElementById('setupBanner').style.display = 'none';
+
+  document.getElementById('searchInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') addStock();
   });
 
@@ -124,6 +124,12 @@ async function fetchStockQuote(symbol) {
 async function fetchAllNews() {
   if (DEMO_MODE) {
     allNews = [...DEMO_NEWS];
+    const demoSymbols = Object.keys(DEMO_STOCKS);
+    for (const sym of watchlist) {
+      if (!demoSymbols.includes(sym)) {
+        await fetchNewsForSymbol(sym);
+      }
+    }
     renderNews();
     return;
   }
@@ -134,7 +140,23 @@ async function fetchAllNews() {
 }
 
 async function fetchNewsForSymbol(symbol) {
-  if (DEMO_MODE) return;
+  if (DEMO_MODE) {
+    const demoSymbols = Object.keys(DEMO_STOCKS);
+    if (!demoSymbols.includes(symbol)) {
+      const placeholderNews = [
+        {
+          title:  `${symbol} was added to your watchlist — live news loads when API mode is enabled`,
+          source: 'WSI Demo',
+          date:   new Date().toISOString().slice(0, 10),
+          symbol,
+          url:    '#'
+        }
+      ];
+      allNews = [...allNews.filter(n => n.symbol !== symbol), ...placeholderNews];
+      renderNews();
+    }
+    return;
+  }
 
   try {
     const url  = `https://newsapi.org/v2/everything?q=${symbol}+stock&sortBy=publishedAt&pageSize=3&apiKey=${NEWS_KEY}`;
