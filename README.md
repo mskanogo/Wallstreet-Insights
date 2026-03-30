@@ -3,6 +3,9 @@
 This is a real-time stock market watchlist and news tracker built with HTML, CSS and Javascript.
 You can search for any stock by ticker symbol, track prices, compare performances side by side, and read the lastest financial news.
 
+## Live video demonstration
+https://www.loom.com/share/b174ab1be1104faea45abedc6af23e66
+
 ## Live demo
 
 |Server | URL |
