@@ -1,9 +1,10 @@
-# Wall Street Insights 📈
+# Wall Street Insights 
 
 A real-time stock market dashboard that allows users to track stock prices, compare performance, and read the latest financial news — all in one place.
 
 ---
-## Video demonstration
+
+## Video demonstration 
 https://www.loom.com/share/b174ab1be1104faea45abedc6af23e66
 
 ## Live Demo
@@ -18,14 +19,14 @@ https://www.loom.com/share/b174ab1be1104faea45abedc6af23e66
 
 ## Features
 
--  **Search & Add Stocks** — Look up any real ticker symbol and add it to your personal watchlist
--  **Stock Cards** — View live price, change, high, low, open and volume for each stock
--  **Live News Feed** — Latest financial news fetched per ticker symbol
--  **Filter News by Ticker** — Click any ticker chip to filter news to that stock only
--  **Sort Watchlist** — Sort your stocks by symbol, price or % change
--  **Compare Stocks** — Select up to 5 stocks to compare side by side in a table
--  **Persistent Watchlist** — Your watchlist is saved in localStorage and restored on reload
--  **Error Handling** — Invalid tickers are rejected with clear feedback; network errors are caught gracefully
+- **Search & Add Stocks** — Look up any real ticker symbol and add it to your personal watchlist
+- **Stock Cards** — View live price, change, high, low, open and volume for each stock
+- **Live News Feed** — Latest financial news fetched per ticker symbol
+- **Filter News by Ticker** — Click any ticker chip to filter news to that stock only
+- **Sort Watchlist** — Sort your stocks by symbol, price or % change
+- **Compare Stocks** — Select up to 5 stocks to compare side by side in a table
+- **Persistent Watchlist** — Your watchlist is saved in localStorage and restored on reload
+- **Error Handling** — Invalid tickers are rejected with clear feedback; network errors are caught gracefully
 
 ---
 
@@ -73,7 +74,7 @@ https://www.loom.com/share/b174ab1be1104faea45abedc6af23e66
 
 5. **Open `index.html` directly in your browser** — no build tools or server required.
 
->  `config.js` is listed in `.gitignore` and will never be uploaded to GitHub.
+> `config.js` is listed in `.gitignore` and will never be uploaded to GitHub.
 > Always keep your API keys out of version control.
 
 ---
@@ -95,7 +96,7 @@ Wallstreet-Insights/
 
 ## Deployment
 
-The application is deployed on two web servers behind a load balancer using **Nginx**.
+The application is deployed on two web servers (**Web01** and **Web02**) using **Nginx** as the web server, and **HAProxy** as the load balancer.
 
 ### Web Servers
 
@@ -132,41 +133,41 @@ scp config.js ubuntu@13.222.62.164:/var/www/html/config.js
 
 ### Load Balancer Configuration
 
-The load balancer at `https://www.mskanogo.tech` was configured using Nginx to distribute traffic between Web01 and Web02.
+The load balancer at `https://www.mskanogo.tech` uses **HAProxy** which was pre-configured on the load balancer server. HAProxy listens on port 80, redirects all traffic to HTTPS, and distributes requests between Web01 and Web02 using a round-robin algorithm.
 
-**1. SSH into the load balancer and edit the Nginx config:**
+The HAProxy configuration at `/etc/haproxy/haproxy.cfg` is as follows:
+
+```
+frontend http_front
+    bind *:80
+    redirect scheme https code 301 if !{ ssl_fc }
+
+frontend https_front
+    bind *:443 ssl crt /etc/ssl/private/www.mskanogo.tech.pem
+    default_backend http_back
+
+backend http_back
+    balance roundrobin
+    server 7023-web-01 34.227.15.242:80 check
+    server 7023-web-02 13.222.62.164:80 check
+```
+
+**To verify HAProxy is running:**
 ```bash
-ssh ubuntu@<load-balancer-ip>
-sudo nano /etc/nginx/sites-available/default
+ssh ubuntu@54.87.168.130
+sudo systemctl status haproxy
 ```
 
-**2. Add the following upstream block to the config:**
-```nginx
-upstream wallstreet_insights {
-    server 34.227.15.242;
-    server 13.222.62.164;
-}
+**To verify traffic is being load balanced**, visit `https://www.mskanogo.tech` and refresh several times — HAProxy will alternate requests between Web01 and Web02 using round-robin.
 
-server {
-    listen 80;
-    server_name mskanogo.tech www.mskanogo.tech;
+### DNS Configuration
 
-    location / {
-        proxy_pass http://wallstreet_insights;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
-}
-```
+The domain `mskanogo.tech` was pointed to the load balancer by adding the following A records in the domain registrar (Name Dot Store):
 
-**3. Test and reload Nginx:**
-```bash
-sudo nginx -t
-sudo systemctl reload nginx
-```
-
-**4. Verify the load balancer is distributing traffic** by visiting `https://www.mskanogo.tech` and refreshing several times — requests will alternate between Web01 and Web02.
+| Type | Host | Value | TTL |
+|---|---|---|---|
+| A | @ | 54.87.168.130 | 300 |
+| A | www | 54.87.168.130 | 300 |
 
 ---
 
@@ -194,5 +195,6 @@ Both Alpha Vantage and NewsAPI enforce strict rate limits on their free plans:
 
 - **[Alpha Vantage](https://www.alphavantage.co/)** — Stock market data API
 - **[NewsAPI](https://newsapi.org/)** — Financial news aggregation API
-- **[Nginx](https://nginx.org/)** — Web server and load balancer
-- Developed by **Martha Stacey Wanjiku Kanogo** 
+- **[Nginx](https://nginx.org/)** — Web server on Web01 and Web02
+- **[HAProxy](https://www.haproxy.org/)** — Load balancer
+- Developed by **Martha Stacey Wanjiku Kanogo** — ALU Web Infrastructure, January Term 2026
