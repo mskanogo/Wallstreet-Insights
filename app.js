@@ -1,7 +1,7 @@
 const ALPHA_KEY = CONFIG.ALPHA_KEY;
 const NEWS_KEY  = CONFIG.NEWS_KEY;
 
-const DEMO_MODE = true;
+const DEMO_MODE = false;
 
 let watchlist          = JSON.parse(localStorage.getItem('wsi_watchlist') || '[]');
 let stockData          = {};
@@ -17,7 +17,6 @@ const DEMO_STOCKS = {
   NVDA:  { symbol:'NVDA',  name:'NVIDIA Corp.',    price:'875.40', change:'+22.10', changePct:'+2.59%', high:'880.00', low:'860.50', volume:'45,600,000', open:'862.00' },
 };
 
-// ✅ FIX: Known real tickers — allows these to be added in demo mode with placeholder data
 const VALID_TICKERS = new Set([
   'AAPL','MSFT','GOOGL','GOOG','AMZN','NVDA','META','TSLA','BRK.A','BRK.B',
   'UNH','LLY','JPM','V','AVGO','XOM','PG','MA','HD','COST','MRK','CVX','ABBV',
@@ -110,9 +109,9 @@ async function addStock() {
 
 async function fetchStockQuote(symbol) {
   if (DEMO_MODE) {
-    // ✅ FIX: Return full demo data for the 4 built-in demo stocks
+    
     if (DEMO_STOCKS[symbol]) return DEMO_STOCKS[symbol];
-    // Return placeholder data for any other known real ticker
+    
     if (VALID_TICKERS.has(symbol)) {
       return {
         symbol, name: symbol,
@@ -120,7 +119,7 @@ async function fetchStockQuote(symbol) {
         high:'100.00', low:'100.00', volume:'0', open:'100.00'
       };
     }
-    // Reject anything unrecognised (fake or misspelled tickers)
+    
     return null;
   }
 
@@ -156,7 +155,6 @@ async function fetchStockQuote(symbol) {
   }
 }
 
-// ✅ FIX 1: fetchAllNews now handles extra tickers added in demo mode
 async function fetchAllNews() {
   if (DEMO_MODE) {
     allNews = [...DEMO_NEWS];
@@ -175,7 +173,6 @@ async function fetchAllNews() {
   }
 }
 
-// ✅ FIX 2: fetchNewsForSymbol now generates placeholder news for new tickers in demo mode
 async function fetchNewsForSymbol(symbol) {
   if (DEMO_MODE) {
     const demoSymbols = Object.keys(DEMO_STOCKS);
