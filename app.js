@@ -1,5 +1,5 @@
-const ALPHA_KEY = 'QFFWXW609ISDNJSY';
-const NEWS_KEY  = 'c11d7dec059a4f4eb303b124e2974614';
+const ALPHA_KEY = CONFIG.ALPHA_KEY;
+const NEWS_KEY  = CONFIG.NEWS_KEY;
 
 const DEMO_MODE = true;
 
@@ -16,6 +16,34 @@ const DEMO_STOCKS = {
   MSFT:  { symbol:'MSFT',  name:'Microsoft Corp.', price:'420.55', change:'+5.12',  changePct:'+1.23%', high:'422.00', low:'415.30', volume:'21,450,000', open:'416.00' },
   NVDA:  { symbol:'NVDA',  name:'NVIDIA Corp.',    price:'875.40', change:'+22.10', changePct:'+2.59%', high:'880.00', low:'860.50', volume:'45,600,000', open:'862.00' },
 };
+
+// ✅ FIX: Known real tickers — allows these to be added in demo mode with placeholder data
+const VALID_TICKERS = new Set([
+  'AAPL','MSFT','GOOGL','GOOG','AMZN','NVDA','META','TSLA','BRK.A','BRK.B',
+  'UNH','LLY','JPM','V','AVGO','XOM','PG','MA','HD','COST','MRK','CVX','ABBV',
+  'KO','PEP','ADBE','WMT','BAC','CRM','MCD','TMO','CSCO','ACN','ABT','LIN',
+  'ORCL','DHR','NFLX','AMD','TXN','PM','NEE','QCOM','RTX','INTU','HON','AMGN',
+  'UPS','CAT','LOW','SPGI','GS','MS','BLK','AXP','SBUX','IBM','MDT','DE','GILD',
+  'BKNG','ADI','ISRG','VRTX','PLD','AMT','SYK','REGN','ZTS','MMC','CI','CB',
+  'BDX','ELV','MO','DUK','SO','AON','ITW','BSX','PGR','CME','EOG','COP','SLB',
+  'PSA','WM','NOC','GD','LMT','HUM','FCX','MCO','ICE','NSC','USB','TFC','PNC',
+  'F','GM','GE','MMM','BA','T','VZ','INTC','WFC','C','DIS','PYPL','UBER','LYFT',
+  'SNAP','PINS','ROKU','SQ','SHOP','SPOT','ABNB','DASH','COIN','HOOD','PLTR',
+  'RBLX','U','DKNG','SOFI','AFRM','RIVN','LCID','NIO','XPEV','LI','BIDU',
+  'JD','PDD','BABA','TSM','ASML','SAP','TM','SONY','HMC','BP','SHEL','HSBC',
+  'ZM','DOCU','DDOG','SNOW','MDB','CRWD','NET','OKTA','ZS','PANW','FTNT',
+  'TWLO','HUBS','PAYC','PCTY','FIS','FISV','GPN','ETSY','CHWY','W','EA',
+  'TTWO','ATVI','AMC','GME','BB','SPY','QQQ','IWM','DIA','VTI','VOO','GLD',
+  'SLV','XLE','XLF','XLK','XLV','XLI','XLY','XLP','XLU','XLB','XBI','ARKG',
+  'ARKK','ARKW','ARKF','ARKQ','UAL','DAL','AAL','LUV','RCL','CCL','NCLH',
+  'MAR','HLT','EXPE','TRIP','NKE','LULU','TGT','TJX','ROST','ULTA','BBWI',
+  'CL','EL','KVUE','CHD','CLX','K','GIS','CPB','SJM','MKC','CAG','HRL',
+  'TSN','KHC','MDLZ','HSY','MNST','KDP','STZ','BUD','SAM','TAP','DEO',
+  'RACE','GM','F','STLA','HMC','TM','VWAGY','BMWYY','MBGYY','NSANY',
+  'INTC','TXN','QCOM','AVGO','MU','AMAT','LRCX','KLAC','ASML','TSM','STM',
+  'ON','MCHP','SWKS','QRVO','MPWR','ENPH','FSLR','NEP','PLUG','BE','SPCE',
+  'COIN','MSTR','RIOT','MARA','HUT','BTBT','SOS','CLSK','IREN','CIFR'
+]);
 
 const DEMO_NEWS = [
   { title:'Apple reports record services revenue in Q1 2026', source:'Bloomberg', date:'2026-03-22', symbol:'AAPL', url:'#' },
@@ -82,11 +110,18 @@ async function addStock() {
 
 async function fetchStockQuote(symbol) {
   if (DEMO_MODE) {
-    return DEMO_STOCKS[symbol] || {
-      symbol, name: symbol,
-      price:'100.00', change:'+0.00', changePct:'+0.00%',
-      high:'100.00', low:'100.00', volume:'0', open:'100.00'
-    };
+    // ✅ FIX: Return full demo data for the 4 built-in demo stocks
+    if (DEMO_STOCKS[symbol]) return DEMO_STOCKS[symbol];
+    // Return placeholder data for any other known real ticker
+    if (VALID_TICKERS.has(symbol)) {
+      return {
+        symbol, name: symbol,
+        price:'100.00', change:'+0.00', changePct:'+0.00%',
+        high:'100.00', low:'100.00', volume:'0', open:'100.00'
+      };
+    }
+    // Reject anything unrecognised (fake or misspelled tickers)
+    return null;
   }
 
   try {
@@ -121,6 +156,7 @@ async function fetchStockQuote(symbol) {
   }
 }
 
+// ✅ FIX 1: fetchAllNews now handles extra tickers added in demo mode
 async function fetchAllNews() {
   if (DEMO_MODE) {
     allNews = [...DEMO_NEWS];
@@ -139,6 +175,7 @@ async function fetchAllNews() {
   }
 }
 
+// ✅ FIX 2: fetchNewsForSymbol now generates placeholder news for new tickers in demo mode
 async function fetchNewsForSymbol(symbol) {
   if (DEMO_MODE) {
     const demoSymbols = Object.keys(DEMO_STOCKS);
